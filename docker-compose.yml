@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:7.2.5-alpine
+    container_name: redis
+    restart: always
+    command: ["sh", "/etc/redis/entrypoint.sh"]
+    env_file:
+      - .env
+    volumes:
+      - ./entrypoint.sh:/etc/redis/entrypoint.sh
+    networks:
+      network_dev:
+        aliases:
+          - redis
+  redis_commander:
+    container_name: redis_commander
+    env_file:
+      - .env
+    image: rediscommander/redis-commander
+    restart: unless-stopped
+    ports:
+      - 8123:8081
+    networks:
+      network_dev:
+        aliases:
+          - redis
+  adminer:
+    container_name: "adminer"
+    image: adminer
+    volumes:
+      - ./docker/adminer.css:/var/www/html/adminer.css
+    restart: unless-stopped
+    ports:
+      - 8083:8080
+networks:
+  network_dev:
+    name: "network_dev"
